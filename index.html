@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Source Code Pro', monospace;
+            background-color: #000;
+            color: #00ff41;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hidden-transition {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .hidden-transition.hidden {
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="container bg-black border-2 border-[#00ff41] p-6 md:p-10 transition-all duration-300">
+        
+        <!-- Main Inbox View -->
+        <div id="inbox-panel" class="hidden-transition">
+            <header class="text-center mb-8">
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-[#00ff41]">
+                    MysticTemp
+                </h1>
+                <p class="text-gray-400 mt-2 text-lg">
+                    A temporary email address for secure communication.
+                </p>
+            </header>
+
+            <!-- Email Generation Section -->
+            <section class="mb-8 p-6 bg-[#012501] border border-[#00ff41] transition-all duration-300">
+                <h2 class="text-2xl font-bold text-[#00ff41] mb-4">Email Address</h2>
+                <div id="email-address-container" class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
+                    <div id="email-display" class="flex-grow w-full text-center md:text-left font-mono text-lg text-[#00ff41] bg-black p-3 border border-dashed border-[#00ff41] overflow-x-auto whitespace-nowrap">
+                        Generating...
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="new-email-btn" class="flex items-center justify-center bg-[#005a00] hover:bg-[#008c00] text-[#00ff41] font-medium py-3 px-6 border-2 border-[#00ff41] shadow-lg transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                            New Email
+                        </button>
+                        <button id="copy-btn" class="flex items-center justify-center bg-[#003d00] hover:bg-[#005a00] text-[#00ff41] font-medium py-3 px-6 border-2 border-[#00ff41] shadow-lg transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3h-2a3 3 0 01-3-3z" />
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+                <p id="copy-message" class="text-sm text-lime-400 mt-2 text-center md:text-left hidden">Email copied to clipboard!</p>
+                <p id="error-message" class="text-sm text-red-500 mt-2 text-center md:text-left hidden"></p>
+            </section>
+
+            <!-- Inbox Section -->
+            <section class="p-6 bg-[#012501] border border-[#00ff41]">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-[#00ff41]">Inbox</h2>
+                    <div class="flex items-center space-x-2">
+                        <span id="refresh-status" class="text-xs text-gray-400">Auto-refresh: On</span>
+                        <button id="refresh-btn" class="flex items-center justify-center bg-[#005a00] hover:bg-[#008c00] text-[#00ff41] font-medium py-2 px-4 border-2 border-[#00ff41] shadow-md transition-all duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0114 0v.683a1 1 0 01-2 0v-.683a5.002 5.002 0 00-10 0V3a1 1 0 01-2 0v3.253a7.004 7.004 0 01-.194 2.219l-1.325-.992a1 1 0 01.662-1.776l3.52 1.334a.8.8 0 00.125-.098l.583-.499A7.001 7.001 0 014 9.117V9a1 1 0 012 0v.117A5.001 5.001 0 0016 9.117V9a1 1 0 012 0v.117A7.001 7.001 0 014 9.117zM14 16a1 1 0 01-1 1v-2.101a7.002 7.002 0 01-14 0v-.683a1 1 0 012 0v.683a5.002 5.002 0 0010 0V16a1 1 0 012 0v-3.253a7.004 7.004 0 01.194-2.219l1.325.992a1 1 0 01-.662 1.776l-3.52-1.334a.8.8 0 00-.125.098l-.583.499A7.001 7.001 0 0116 10.883V11a1 1 0 01-2 0v-.117A5.001 5.001 0 004 10.883V11a1 1 0 01-2 0v-.117A7.001 7.001 0 0116 10.883z" clip-rule="evenodd" />
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+                <div id="inbox-container" class="space-y-4">
+                    <p id="inbox-status" class="text-gray-500 text-center text-sm">No emails received yet.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Full Email View -->
+        <div id="email-full-view" class="hidden-transition hidden">
+            <button id="back-btn" class="flex items-center text-gray-400 hover:text-[#00ff41] font-medium mb-4 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Back to Inbox
+            </button>
+            <div class="bg-black border border-[#00ff41] shadow-lg p-6 md:p-8">
+                <h2 id="email-subject" class="text-3xl font-bold text-[#00ff41] mb-2"></h2>
+                <p id="email-from" class="text-gray-400 mb-1"></p>
+                <p id="email-date" class="text-gray-500 text-sm mb-4"></p>
+                <hr class="border-[#00ff41] my-4">
+                <div id="email-body-content" class="text-[#00ff41] overflow-y-auto max-h-[60vh] md:max-h-[70vh]">
+                    <p class="text-center text-gray-500">Loading message body...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://api.mail.tm';
+
+        const newEmailBtn = document.getElementById('new-email-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const emailDisplay = document.getElementById('email-display');
+        const copyMessage = document.getElementById('copy-message');
+        const errorMessageEl = document.getElementById('error-message');
+        const inboxContainer = document.getElementById('inbox-container');
+        const inboxStatus = document.getElementById('inbox-status');
+        const refreshStatus = document.getElementById('refresh-status');
+
+        const inboxPanel = document.getElementById('inbox-panel');
+        const emailFullView = document.getElementById('email-full-view');
+        const backBtn = document.getElementById('back-btn');
+        const emailSubjectEl = document.getElementById('email-subject');
+        const emailFromEl = document.getElementById('email-from');
+        const emailDateEl = document.getElementById('email-date');
+        const emailBodyEl = document.getElementById('email-body-content');
+
+        let currentAccount = null;
+        let refreshIntervalId = null;
+
+        // The auto-refresh interval in milliseconds
+        const REFRESH_INTERVAL = 5000;
+
+        function setButtonsState(isLoading) {
+            newEmailBtn.disabled = isLoading;
+            refreshBtn.disabled = isLoading;
+            copyBtn.disabled = isLoading || !currentAccount;
+            emailDisplay.classList.toggle('animate-pulse', isLoading);
+            emailDisplay.classList.toggle('opacity-50', isLoading);
+        }
+
+        function startAutoRefresh() {
+            if (refreshIntervalId) {
+                clearInterval(refreshIntervalId);
+            }
+            refreshIntervalId = setInterval(() => {
+                fetchInbox();
+            }, REFRESH_INTERVAL);
+            refreshStatus.textContent = 'Auto-refresh: On';
+            refreshStatus.classList.remove('text-red-500');
+            refreshStatus.classList.add('text-[#00ff41]');
+        }
+
+        function stopAutoRefresh() {
+            if (refreshIntervalId) {
+                clearInterval(refreshIntervalId);
+                refreshIntervalId = null;
+            }
+            refreshStatus.textContent = 'Auto-refresh: Off';
+            refreshStatus.classList.remove('text-[#00ff41]');
+            refreshStatus.classList.add('text-red-500');
+        }
+
+        async function fetchWithRetry(url, options = {}, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response;
+                    }
+                    if (response.status >= 400 && response.status < 500) {
+                        console.error('Client error, not retrying:', response.statusText);
+                        break;
+                    }
+                    throw new Error(`Server error: ${response.status}`);
+                } catch (error) {
+                    if (i < retries - 1) {
+                        await new Promise(res => setTimeout(res, 1000 * Math.pow(2, i)));
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+        }
+
+        async function generateNewEmail() {
+            setButtonsState(true);
+            emailDisplay.textContent = 'Generating...';
+            inboxContainer.innerHTML = '';
+            inboxStatus.textContent = 'Creating new temporary account...';
+            errorMessageEl.classList.add('hidden');
+            currentAccount = null;
+            stopAutoRefresh();
+
+            try {
+                const domainsResponse = await fetchWithRetry(`${API_BASE_URL}/domains`);
+                const domains = await domainsResponse.json();
+                const randomDomain = domains['hydra:member'][Math.floor(Math.random() * domains['hydra:member'].length)];
+
+                const username = `temp${Math.random().toString(36).substring(2, 10)}`;
+                const password = Math.random().toString(36).substring(2, 15);
+                const accountData = {
+                    address: `${username}@${randomDomain.domain}`,
+                    password: password
+                };
+
+                const createAccountResponse = await fetchWithRetry(`${API_BASE_URL}/accounts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(accountData)
+                });
+                
+                currentAccount = await createAccountResponse.json();
+                currentAccount.password = password; // Store password for fetching later
+
+                emailDisplay.textContent = currentAccount.address;
+                inboxStatus.textContent = 'No emails received yet.';
+                startAutoRefresh();
+                
+            } catch (error) {
+                console.error('Failed to generate email:', error);
+                errorMessageEl.textContent = `Failed to generate email: ${error.message}.`;
+                errorMessageEl.classList.remove('hidden');
+                emailDisplay.textContent = 'Error creating email.';
+            } finally {
+                setButtonsState(false);
+            }
+        }
+
+        function copyEmail() {
+            if (!currentAccount) {
+                return;
+            }
+
+            const tempInput = document.createElement('input');
+            tempInput.value = currentAccount.address;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            
+            try {
+                document.execCommand('copy');
+                copyMessage.classList.remove('hidden');
+                setTimeout(() => copyMessage.classList.add('hidden'), 3000);
+            } catch (err) {
+                errorMessageEl.textContent = 'Failed to copy. Please copy the address manually.';
+                errorMessageEl.classList.remove('hidden');
+                console.error('Could not copy text:', err);
+            } finally {
+                document.body.removeChild(tempInput);
+            }
+        }
+
+        async function fetchInbox() {
+            if (!currentAccount) {
+                inboxStatus.textContent = 'Please generate an email first.';
+                return;
+            }
+
+            inboxStatus.textContent = 'Checking for new emails...';
+            errorMessageEl.classList.add('hidden');
+            setButtonsState(true);
+            
+            try {
+                // Log in to get a JWT token
+                const tokenResponse = await fetchWithRetry(`${API_BASE_URL}/token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        address: currentAccount.address,
+                        password: currentAccount.password
+                    })
+                });
+
+                const tokenData = await tokenResponse.json();
+                const token = tokenData.token;
+
+                // Fetch messages using the token
+                const messagesResponse = await fetchWithRetry(`${API_BASE_URL}/messages`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const messagesData = await messagesResponse.json();
+                const messages = messagesData['hydra:member'];
+                
+                if (messages.length === 0) {
+                    inboxStatus.textContent = 'No emails received yet.';
+                } else {
+                    inboxStatus.textContent = `Showing ${messages.length} email(s).`;
+                    inboxContainer.innerHTML = '';
+                    messages.forEach(message => {
+                        const messageElement = createMessageElement(message, token);
+                        inboxContainer.appendChild(messageElement);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to fetch inbox:', error);
+                inboxStatus.innerHTML = `<span class="text-red-500">Error fetching inbox: ${error.message}. Please try refreshing.</span>`;
+            } finally {
+                setButtonsState(false);
+            }
+        }
+
+        function createMessageElement(message, token) {
+            const date = new Date(message.createdAt);
+            const formattedDate = date.toLocaleString();
+            
+            const messageEl = document.createElement('div');
+            messageEl.className = 'bg-black border border-[#00ff41] p-4 cursor-pointer hover:bg-[#012501] transition-colors duration-200';
+            messageEl.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <div class="flex-grow min-w-0">
+                        <div class="flex items-center space-x-2">
+                            <span class="font-semibold text-[#00ff41] truncate">${message.subject || '(No Subject)'}</span>
+                        </div>
+                        <div class="text-sm text-gray-400 truncate mt-1">
+                            from: <span class="font-mono text-xs">${message.from.address}</span>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-500 flex-shrink-0 ml-4">${formattedDate}</span>
+                </div>
+            `;
+            
+            messageEl.addEventListener('click', () => {
+                displayFullEmail(message, token);
+            });
+
+            return messageEl;
+        }
+
+        async function displayFullEmail(message, token) {
+            inboxPanel.classList.add('hidden');
+            emailFullView.classList.remove('hidden');
+
+            emailSubjectEl.textContent = message.subject || '(No Subject)';
+            emailFromEl.innerHTML = `From: <span class="font-medium">${message.from.address}</span>`;
+            const date = new Date(message.createdAt);
+            emailDateEl.textContent = date.toLocaleString();
+            emailBodyEl.innerHTML = '<p class="text-center text-gray-500">Loading message body...</p>';
+
+            try {
+                const messageResponse = await fetchWithRetry(`${API_BASE_URL}/messages/${message.id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const fullMessage = await messageResponse.json();
+                
+                if (fullMessage.text) {
+                    emailBodyEl.innerHTML = `<div class="break-words whitespace-pre-wrap">${fullMessage.text}</div>`;
+                } else if (fullMessage.html) {
+                    emailBodyEl.innerHTML = `<div class="break-words">${fullMessage.html}</div>`;
+                } else {
+                    emailBodyEl.innerHTML = `<p class="text-center text-gray-500">No content found for this message.</p>`;
+                }
+            } catch (error) {
+                console.error('Failed to read message:', error);
+                emailBodyEl.innerHTML = `<p class="text-center text-red-500">Error loading message body.</p>`;
+            }
+        }
+
+        function showInboxPanel() {
+            emailFullView.classList.add('hidden');
+            inboxPanel.classList.remove('hidden');
+        }
+
+        newEmailBtn.addEventListener('click', generateNewEmail);
+        copyBtn.addEventListener('click', copyEmail);
+        refreshBtn.addEventListener('click', fetchInbox);
+        backBtn.addEventListener('click', showInboxPanel);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            generateNewEmail();
+        });
+    </script>
+</body>
+</html>
+
