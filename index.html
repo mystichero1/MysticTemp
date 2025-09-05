@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My</title>
+    <title>MysticTemp</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap');
@@ -111,6 +111,7 @@
 
     <script>
         const API_BASE_URL = 'https://api.mail.tm';
+        const COOLDOWN_SECONDS = 60;
 
         const newEmailBtn = document.getElementById('new-email-btn');
         const copyBtn = document.getElementById('copy-btn');
@@ -132,6 +133,8 @@
 
         let currentAccount = null;
         let refreshIntervalId = null;
+        let cooldownEndTime = 0;
+        let countdownInterval = null;
 
         // The auto-refresh interval in milliseconds
         const REFRESH_INTERVAL = 5000;
@@ -166,6 +169,26 @@
             refreshStatus.classList.add('text-red-500');
         }
 
+        function startCooldown() {
+            cooldownEndTime = Date.now() + COOLDOWN_SECONDS * 1000;
+            newEmailBtn.disabled = true;
+
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            countdownInterval = setInterval(() => {
+                const remaining = Math.max(0, Math.ceil((cooldownEndTime - Date.now()) / 1000));
+                if (remaining > 0) {
+                    newEmailBtn.innerHTML = `Wait (${remaining}s)`;
+                } else {
+                    clearInterval(countdownInterval);
+                    newEmailBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>New Email`;
+                    newEmailBtn.disabled = false;
+                }
+            }, 1000);
+        }
+
         async function fetchWithRetry(url, options = {}, retries = 3) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -189,6 +212,10 @@
         }
 
         async function generateNewEmail() {
+            if (Date.now() < cooldownEndTime) {
+                return;
+            }
+
             setButtonsState(true);
             emailDisplay.textContent = 'Generating...';
             inboxContainer.innerHTML = '';
@@ -221,6 +248,7 @@
                 emailDisplay.textContent = currentAccount.address;
                 inboxStatus.textContent = 'No emails received yet.';
                 startAutoRefresh();
+                startCooldown();
                 
             } catch (error) {
                 console.error('Failed to generate email:', error);
